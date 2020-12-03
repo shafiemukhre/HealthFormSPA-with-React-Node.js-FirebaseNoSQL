@@ -7,95 +7,94 @@ import { ContactChip } from "../ContactChip/ContactChip";
 
 function useDemodata(){
     const [demodata, setDemodata] = useState([])
+    
     useEffect(()=> {
-        firebase
-        .firestore()
-        .collection('demographics')
-        .onSnapshot((snapshot) => {
-            const newDemodata = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setDemodata(newDemodata)
-        })
+        const demographicsRef = firebase.firestore().collection('demographics');
+
+        demographicsRef
+            .onSnapshot((snapshot) => {
+                const newDemodata = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    fullname: doc.data().firstname + ' ' + doc.data().lastname,
+                    ...doc.data()
+                }))
+                setDemodata(newDemodata)
+            })
     },[])
     return demodata
 }
 
 function useHealthdata(){
     const [healthdata, setHealthdata] = useState([])
-
+    
     useEffect( () => {
-        firebase
-        .firestore()
-        .collection('healthvitals')
-        .onSnapshot( (snapshot) => {
-            const newHealthdata = snapshot.docs.map( (doc) => ({
-                id: doc.id,
-                firstnameRef: doc.data().firstnameRef,
-                medications: doc.data().medications,
-                notes: doc.data().notes,
-                pulse: doc.data().pulse,
-                height: doc.data().height,
-                weight: doc.data().weight,
-                temp: doc.data().temp,
-                bp: doc.data().bp
-            }))
-            setHealthdata(newHealthdata)
-        })
+        const healthVitalsRef = firebase.firestore().collection('healthvitals');
+        
+        healthVitalsRef
+            .onSnapshot( (snapshot) => {
+                const newHealthdata = snapshot.docs.map( (doc) => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                setHealthdata(newHealthdata)
+            })
     },[])
     return healthdata
 }
 
 function Name(props){
     if (props.name){
-        return <h4>{props.name}'s Report</h4>
+        return <h3>{props.name}</h3>
     } else {
         return <h4>Select Patient</h4>
     }
-    
 }
 
 export function Reports(){
-
-    const [patientName, setPatientName] = useState(null)
-
+    
+    const [patientID, setPatientID] = useState(null)
+    
     const patients = useDemodata() 
     const healths = useHealthdata()
+    
+    //AFTER FIRST RENDER, CLICK BUTTON ELEMENT ON PAGE LOAD
+    useEffect(() => {
+        document.getElementById("selectpatient").click();
+    },[])
 
     return (
         <div className="container">
             <br></br>
             <div className="btn-group dropright">
-                <button type="button" className="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="selectpatient" type="button" className="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Patient Name
                 </button>&nbsp;&nbsp;&nbsp;&nbsp;
-                <Name name={patientName}/>
+                {patientID && <Name name={patients.filter( p => p.id === patientID)[0].fullname}/>}
                 <div className="dropdown-menu">
-                    {patients.map((p, i) => (
-                        <button className="dropdown-item" key={i}  onClick={() => setPatientName(p.firstname)}>
-                            <ContactChip key={p.id} image={p.photo} firstname={p.firstname} lastname={p.lastname}/>
+                    {patients.map((p) => (
+                        <button className="dropdown-item" key={p.id} onClick={() => setPatientID(p.id)}>
+                            <ContactChip key={p.id} image={p.photo} fullname={p.fullname}/>
                         </button>
                     ))}
                 </div>
             </div>
             <div className="row">
                 <div className="col-sm col-lg-5" style={{paddingTop: "10px"}}>
-                    {patients.map( (p) => {
-                        if (p.firstname === patientName){
+                    {patients.map( (p, i) => {
+                        if (p.id === patientID){
                             return (
                                 <PatientCard
-                                    key = {p.id}
+                                    key = {i}
                                     photo = {p.photo}
                                     gender = {p.gender}
                                     age = {p.age}
-                                    height = {healths.filter(h => h.firstnameRef === p.firstname)[0].height}
-                                    date = {p.date}/>
+                                    height = {healths.filter(h => h.id === patientID)[0].height}
+                                    date = {p.lastUpdate.toDate().toDateString()}/>
                             )
                         } else { return null}
                     })}
                     {healths.map( (h) => {
-                        if (h.firstnameRef === patientName){
+                        if (h.id === patientID){
                             return (
                                 <PatientNote
                                     medications = {h.medications}
@@ -107,7 +106,7 @@ export function Reports(){
                 </div>
                 <div className="col-sm col-lg-7" style={{paddingTop: "10px"}}>
                     {healths.map( (h) => {
-                        if (h.firstnameRef === patientName){
+                        if (h.id === patientID){
                             return (
                                 <PatientHealthData
                                     pulse = {h.pulse}

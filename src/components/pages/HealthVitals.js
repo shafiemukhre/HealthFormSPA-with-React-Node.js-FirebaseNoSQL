@@ -1,30 +1,9 @@
 import React, { useState, useEffect } from "react";
-import firebase from '../services/firebase'
-import { useHistory } from 'react-router-dom'
-
-function usePatient(){
-
-    const [patient, setPatient] = useState([])
-
-    useEffect( () => {
-        firebase
-        .firestore()
-        .collection('demographics')
-        .onSnapshot( (snapshot) => {
-            const newPatient = snapshot.docs.map( (doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            setPatient(newPatient)
-        })
-    },[])
-
-    return patient
-}
-
+import firebase from '../services/firebase';
+import { useHistory } from 'react-router-dom';
 
 export function HealthVitals(){
-
+    //DEFINE ALL STATES
     const [height, setHeight] = useState('')
     const [weight, setWeight] = useState('')
     const [temp, setTemp] = useState('')
@@ -32,32 +11,44 @@ export function HealthVitals(){
     const [bp, setBp] = useState('')
     const [medications, setMedications] = useState('')
     const [notes, setNotes] = useState('')
-    const [firstnameRef, setFirstnameRef] = useState('')
+    const [patients, setPatients] = useState([])
+    const [patientID, setPatientID] = useState('')
+    
+    //FIREBASE COLLECTION REFERENCES
+    const healthVitalsRef = firebase.firestore().collection('healthvitals');
+    
+    //AFTER FIRST RENDER, UPDATE LIST OF PATIENTS STATE
+    useEffect( () => {
+        const demographicsRef = firebase.firestore().collection('demographics');
 
-    const patients = usePatient()
-
-    const history = useHistory()
-
-    function onSubmitHealth(e){
-
-        //firebase
-        e.preventDefault()
-
-        firebase
-            .firestore()
-            .collection('healthvitals')
-            .add({
-                firstnameRef,
-                height,
-                weight,
-                temp,
-                pulse,
-                bp,
-                medications,
-                notes
+        demographicsRef
+            .onSnapshot( (snapshot) => {
+                const newPatients = snapshot.docs.map( (doc) => ({
+                    id: doc.id,
+                    fullname: doc.data().firstname + ' ' + doc.data().lastname,
+                }))
+                setPatients(newPatients)
             })
+    },[])
+    
+    //SAVE FUNCTION
+    const history = useHistory()
+    function onSubmitHealth(e){
+        e.preventDefault(); //for firebase
+        const newVitals = {
+            height,
+            weight,
+            temp,
+            pulse,
+            bp,
+            medications,
+            notes,
+        };
+
+        healthVitalsRef
+            .doc(patientID)
+            .set(newVitals)
             .then(() => {
-                setFirstnameRef('')
                 setHeight('')
                 setWeight('')
                 setTemp('')
@@ -66,12 +57,25 @@ export function HealthVitals(){
                 setMedications('')
                 setNotes('')
             })
+            .catch( (err) => {console.log(err)});
             
         //navigate
         history.push("/reports")
-
     }
-
+        
+    //only enable button if all input boxes are filled
+    function SubmitButton(){
+        if (patientID && height && weight && temp && pulse && bp){
+            return (
+                <button type="submit" form="healthform" className="btn btn-outline-primary"id="savebtn2">Save</button>
+                )
+            } else {
+                return (
+                    <button type="submit" form="healthform" className="btn btn-outline-primary"id="savebtn2" disabled>Save</button>
+                    )
+                }
+            }
+    
     return (
         <div className="container-fluid">
             <br/><br/>
@@ -81,11 +85,11 @@ export function HealthVitals(){
                         <div className="form-group row">
                             <label htmlFor="patient" className="col-form-label col-md text-right">Patient Name:</label>
                             <div className="col-md">
-                                <select className="custom-select" id="patient" value={firstnameRef} onChange={e => setFirstnameRef(e.target.value)}>
+                                <select className="custom-select" id="patient" value={patientID} onChange={e => setPatientID(e.target.value)}>
                                     <option value=""></option>
-                                    {patients.map( (patient, i) => 
-                                        <option value={patient.firstname} key={i}>{patient.firstname} {patient.lastname}</option>
-                                    )}
+                                    {patients.map( (patient) => 
+                                        <option value={patient.id} key={patient.id}>{patient.fullname}</option>
+                                        )}
                                 </select>
                             </div>
                         </div>
@@ -127,7 +131,7 @@ export function HealthVitals(){
                 <div className="row">
                     <div className="col-3"></div>
                     <div className="col-3 d-flex justify-content-center">
-                            <button type="submit" form="healthform" className="btn btn-outline-primary"id="savebtn2">Save</button>
+                            <SubmitButton/>
                     </div>
                     <div className="col-6"></div>
                 </div>

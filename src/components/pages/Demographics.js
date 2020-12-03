@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef } from "react";
-import { useHistory } from 'react-router-dom'
-import firebase from '../services/firebase'
+import { useHistory } from 'react-router-dom';
+import firebase from '../services/firebase';
+import { v4 as uuidv4 } from 'uuid';
 
 export function Demographics(){
     //firebase
@@ -8,9 +9,10 @@ export function Demographics(){
     const [lastname, setLastname] = useState('')
     const [gender, setGender] = useState('')
     const [age, setAge] = useState('')
-    const [date, setDate] = useState('')
 
     const history = useHistory();
+
+    const demographicsRef = firebase.firestore().collection('demographics');
 
     function onSubmitDemo(e) {
 
@@ -21,24 +23,27 @@ export function Demographics(){
         //firebase
         e.preventDefault()
 
-        firebase
-            .firestore()
-            .collection('demographics')
-            .add({
-                firstname,
-                lastname,
-                gender,
-                age,
-                date,
-                photo,
-            })
+        const newPatient = {
+            id: uuidv4(),
+            firstname,
+            lastname,
+            gender,
+            age,
+            photo,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+
+        demographicsRef
+            .doc(newPatient.id)
+            .set(newPatient)
             .then(() => {
                 setFirstname('')
                 setLastname('')
                 setGender('')
                 setAge('')
-                setDate('')
             })
+            .catch((err) => {console.log(err)});
         
         //navigate
         history.push("/healthvitals")
@@ -79,6 +84,19 @@ export function Demographics(){
         canvas.getContext('2d').drawImage(photo, 0, 0, 150, 150)
     }
 
+    //only enable button if all input boxes are filled
+    function SubmitButton(){
+        if (firstname && lastname && age && gender){
+            return (
+                <button type="submit" form="demoform" className="btn btn-outline-primary" id="savebtn1">Save</button>
+                )
+            } else {
+                return (
+                    <button type="submit" form="demoform" className="btn btn-outline-primary" id="savebtn1" disabled>Save</button>
+            )
+        }
+    }
+
     return (
         <div className="containter-fluid" style={{paddingLeft: "15px", paddingRight: "15px"}}>
             <br/><br/>
@@ -107,10 +125,6 @@ export function Demographics(){
                             <label htmlFor="age" className="col-form-label col-md text-right">Age:</label>
                             <div className="col-md"><input type="number" id="age" className="form-control" placeholder="years" value={age} onChange={e => setAge(e.target.value)}/></div>
                         </div>
-                        <div className="form-group row">
-                            <label htmlFor="date" className="col-form-label col-md text-right">Visit Date</label>
-                            <div className="col-md"><input id="date" className="form-control" placeholder="MM/DD/YYYY"value={date} onChange={e => setDate(e.target.value)}/></div>
-                        </div>
                     </div>
                     <div className="col-sm">
                         <div className="row ">
@@ -127,7 +141,7 @@ export function Demographics(){
                 <div className="row">
                     <div className="col-3"></div>
                         <div className="col-3 ">
-                                <button type="submit" form="demoform" className="btn btn-outline-primary" id="savebtn1" >Save</button>
+                            <SubmitButton/>
                         </div>
                     <div className="col-6"></div>
                 </div>

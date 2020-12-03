@@ -5,7 +5,7 @@ export function ContactChip(props){
     return (
         <div className="chip">
             <img src={props.image} width={96} height={96} alt="Patient"/>
-            {props.firstname} {props.lastname}
+            {props.fullname}
         </div>
     )
 };

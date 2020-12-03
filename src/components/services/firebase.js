@@ -1,5 +1,5 @@
-import firebase from 'firebase/app'
-import 'firebase/firebase-firestore'
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -11,8 +11,8 @@ storageBucket: "healthformspa.appspot.com",
 messagingSenderId: "693532090223",
 appId: "1:693532090223:web:19a30fa1ed469b2299529a"
 };
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-export default firebase
-
+export default firebase;
