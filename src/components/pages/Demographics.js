@@ -10,6 +10,8 @@ export function Demographics(){
     const [age, setAge] = useState('')
     const [details, setDetails] = useState('')
 
+    const history = useHistory();
+
     function onSubmitDemo(e) {
 
         //photo
@@ -37,6 +39,9 @@ export function Demographics(){
                 setAge('')
                 setDetails('')
             })
+        
+        //navigate
+        history.push("/healthvitals")
     }
 
     //webcamvideofeed
@@ -74,69 +79,60 @@ export function Demographics(){
         canvas.getContext('2d').drawImage(photo, 0, 0, 150, 150)
     }
 
-    //navigate
-
-    const history = useHistory();
-
-    function handleClick() {
-        history.push("/healthvitals");
-    }
-
-
     return (
-        <div class="containter">
+        <div className="containter-fluid" style={{paddingLeft: "15px", paddingRight: "15px"}}>
             <br/><br/>
-            <form onSubmit = {onSubmitDemo}>
-                <div class="row">
-                    <div class="col-sm">
-                        <div class="form-group row">
-                            <label for="firstname" class="col-form-label col-md text-right">First Name:</label>
-                            <div class="col-md"><input type="text" id="firstname" class="form-control" value={firstname} onChange={e => setFirstname(e.target.value)}/></div>
+            <form id="demoform" onSubmit={onSubmitDemo}>
+                <div className="row">
+                    <div className="col-sm">
+                        <div className="form-group row">
+                            <label htmlFor="firstname" className="col-form-label col-md text-right">First Name:</label>
+                            <div className="col-md"><input type="text" id="firstname" className="form-control" value={firstname} onChange={e => setFirstname(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="lastname" class="col-form-label col-md text-right">Last Name:</label>
-                            <div class="col-md"><input type="text" id="lastname" class="form-control" value={lastname} onChange={e => setLastname(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="lastname" className="col-form-label col-md text-right">Last Name:</label>
+                            <div className="col-md"><input type="text" id="lastname" className="form-control" value={lastname} onChange={e => setLastname(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="gender" class="col-form-label col-md text-right">Gender:</label>
-                            <div class="col-md">
-                                <select class="custom-select" id="gender" value={gender} onChange={e => setGender(e.target.value)}>
+                        <div className="form-group row">
+                            <label htmlFor="gender" className="col-form-label col-md text-right">Gender:</label>
+                            <div className="col-md">
+                                <select className="custom-select" id="gender" value={gender} onChange={e => setGender(e.target.value)}>
                                     <option value=""></option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label for="age" class="col-form-label col-md text-right">Age:</label>
-                            <div class="col-md"><input type="number" id="age" class="form-control" value={age} onChange={e => setAge(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="age" className="col-form-label col-md text-right">Age:</label>
+                            <div className="col-md"><input type="number" id="age" className="form-control" placeholder="years" value={age} onChange={e => setAge(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="details" class="col-form-label col-md text-right">Notes or Other details:</label>
-                            <div class="col-md"><textarea id="details" class="form-control" value={details} onChange={e => setDetails(e.target.value)}></textarea></div>
+                        <div className="form-group row">
+                            <label htmlFor="details" className="col-form-label col-md text-right">Visit Date</label>
+                            <div className="col-md"><input id="details" className="form-control" placeholder="MM/DD/YYYY"value={details} onChange={e => setDetails(e.target.value)}/></div>
                         </div>
                     </div>
-                    <div class="col-sm">
-                        <div class="row ">
-                            <div class="form-group col-lg">
-                                <label class="col-form-label">Photo:</label><br/>
+                    <div className="col-sm">
+                        <div className="row ">
+                            <div className="form-group col-lg">
+                                <label className="col-form-label">Photo:</label><br/>
                                     <video id="video" ref={videoRef} playsInline autoPlay></video>
                                     <canvas id="canvas" width="150" height="150" ref={canvasRef}></canvas>
                                 <br/><br/>
-                                <button class="btn btn-outline-primary" id="capture" onClick={onCapture}>Capture</button>
+                                <input type="button" id="capture" className="btn btn-outline-primary" value="Capture" onClick={onCapture}/>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="row">
-                    <div class="col-3"></div>
-                    <div class="col-3 ">
-                            <button class="btn btn-outline-primary" id="savebtn1" onClick={handleClick}>Save</button>
-                    </div>
-                    <div class="col-6"></div>
+                <div className="row">
+                    <div className="col-3"></div>
+                        <div className="col-3 ">
+                                <button type="submit" form="demoform" className="btn btn-outline-primary" id="savebtn1" >Save</button>
+                        </div>
+                    <div className="col-6"></div>
                 </div>
             </form>
+
         </div>
     )
 }

@@ -1,4 +1,6 @@
 import React from 'react';
+import "./components/Icons";
+
 import { Demographics } from './components/pages/Demographics';
 import { NavBar } from './components/layouts/NavBar';
 import {BrowserRouter as Router, Route } from 'react-router-dom';

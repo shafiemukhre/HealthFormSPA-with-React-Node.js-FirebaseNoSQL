@@ -1,6 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import firebase from '../services/firebase'
 import { useHistory } from 'react-router-dom'
+
+function usePatient(){
+
+    const [patient, setPatient] = useState([])
+
+    useEffect( () => {
+        firebase
+        .firestore()
+        .collection('demographics')
+        .onSnapshot( (snapshot) => {
+            const newPatient = snapshot.docs.map( (doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            setPatient(newPatient)
+        })
+    },[])
+
+    return patient
+}
+
 
 export function HealthVitals(){
 
@@ -11,14 +32,22 @@ export function HealthVitals(){
     const [bp, setBp] = useState('')
     const [medications, setMedications] = useState('')
     const [notes, setNotes] = useState('')
+    const [firstnameRef, setFirstnameRef] = useState('')
+
+    const patients = usePatient()
+
+    const history = useHistory()
 
     function onSubmitHealth(e){
+
+        //firebase
         e.preventDefault()
 
         firebase
             .firestore()
             .collection('healthvitals')
             .add({
+                firstnameRef,
                 height,
                 weight,
                 temp,
@@ -28,6 +57,7 @@ export function HealthVitals(){
                 notes
             })
             .then(() => {
+                setFirstnameRef('')
                 setHeight('')
                 setWeight('')
                 setTemp('')
@@ -36,61 +66,70 @@ export function HealthVitals(){
                 setMedications('')
                 setNotes('')
             })
-    }
+            
+        //navigate
+        history.push("/reports")
 
-    const history = useHistory();
-
-    function handleClick() {
-        history.push("/reports");
     }
 
     return (
-        <div class="container-fluid">
+        <div className="container-fluid">
             <br/><br/>
-            <form onSubmit={onSubmitHealth}>
-                <div class="row">
-                    <div class="col-sm">
-                        <div class="form-group row">
-                            <label for="height" class="col-form-label col-md text-right">Height:</label>
-                            <div class="col-md"><input id="height" type="text" class="form-control" value={height} onChange={e => setHeight(e.target.value)}/></div>
+            <form onSubmit={onSubmitHealth} id="healthform">
+                <div className="row">
+                    <div className="col-sm">
+                        <div className="form-group row">
+                            <label htmlFor="patient" className="col-form-label col-md text-right">Patient Name:</label>
+                            <div className="col-md">
+                                <select className="custom-select" id="patient" value={firstnameRef} onChange={e => setFirstnameRef(e.target.value)}>
+                                    <option value=""></option>
+                                    {patients.map( (patient, i) => 
+                                        <option value={patient.firstname} key={i}>{patient.firstname} {patient.lastname}</option>
+                                    )}
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group row">
-                            <label for="weight" class="col-form-label col-md text-right">Weight:</label>
-                            <div class="col-md"><input type="number" id="weight" class="form-control" value={weight} onChange={e => setWeight(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="height" className="col-form-label col-md text-right">Height:</label>
+                            <div className="col-md"><input id="height" type="text" className="form-control" placeholder="example: 5'2" value={height} onChange={e => setHeight(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="temp" class="col-form-label text-right col-md">Body Temperature:</label>
-                            <div class="col-md"><input id="temp" type="number" class="form-control" value={temp} onChange={e => setTemp(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="weight" className="col-form-label col-md text-right">Weight:</label>
+                            <div className="col-md"><input type="number" id="weight" className="form-control" placeholder="lbs" value={weight} onChange={e => setWeight(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="pulse" class="col-form-label col-md text-right">Pulse Rate:</label>
-                            <div class="col-md"><input id="pulse" type="number" class="form-control" value={pulse} onChange={e => setPulse(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="temp" className="col-form-label text-right col-md">Body Temperature:</label>
+                            <div className="col-md"><input id="temp" type="number" className="form-control" placeholder="°F" value={temp} onChange={e => setTemp(e.target.value)}/></div>
                         </div>
-                        <div class="form-group row">
-                            <label for="bp" class="col-form-label col-md text-right">BP:</label>
-                            <div class="col-md"><input id="bp" type="number" class="form-control" value={bp} onChange={e => setBp(e.target.value)}/></div>
+                        <div className="form-group row">
+                            <label htmlFor="pulse" className="col-form-label col-md text-right">Pulse Rate:</label>
+                            <div className="col-md"><input id="pulse" type="number" className="form-control" placeholder="bpm" value={pulse} onChange={e => setPulse(e.target.value)}/></div>
+                        </div>
+                        <div className="form-group row">
+                            <label htmlFor="bp" className="col-form-label col-md text-right">BP:</label>
+                            <div className="col-md"><input id="bp" type="number" className="form-control" placeholder="mm HG" value={bp} onChange={e => setBp(e.target.value)}/></div>
                         </div>
                     </div>
-                    <div class="col-sm">
-                        <div class="row">
-                            <div class="col-lg">
-                                <label class="col-form-label">Medications:</label>
-                                <textarea class="form-control" id="medications" value={medications} onChange={e => setMedications(e.target.value)}></textarea>
+                    <div className="col-sm">
+                        <div className="row">
+                            <div className="col-lg">
+                                <label className="col-form-label">Medications:</label>
+                                <textarea className="form-control" id="medications" value={medications} onChange={e => setMedications(e.target.value)}></textarea>
                                 <br/>
-                                <label for="notes" class="col-form-label">Notes</label>
-                                <textarea class="form-control" id="notes" value={notes} onChange={e => setNotes(e.target.value)}></textarea>
+                                <label htmlFor="notes" className="col-form-label">Notes</label>
+                                <textarea className="form-control" id="notes" value={notes} onChange={e => setNotes(e.target.value)}></textarea>
                             </div>
-                            <div class="col-lg"></div>
+                            <div className="col-lg"></div>
                         </div>
                     </div>
                 </div>
                 <br/>
-                <div class="row">
-                    <div class="col-3"></div>
-                    <div class="col-3 d-flex justify-content-center">
-                            <button class="btn btn-outline-primary" onClick={handleClick} id="savebtn2">Save</button>
+                <div className="row">
+                    <div className="col-3"></div>
+                    <div className="col-3 d-flex justify-content-center">
+                            <button type="submit" form="healthform" className="btn btn-outline-primary"id="savebtn2">Save</button>
                     </div>
-                    <div class="col-6"></div>
+                    <div className="col-6"></div>
                 </div>
             </form>
 
