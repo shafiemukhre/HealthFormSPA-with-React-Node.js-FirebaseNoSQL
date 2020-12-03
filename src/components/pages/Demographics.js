@@ -8,7 +8,7 @@ export function Demographics(){
     const [lastname, setLastname] = useState('')
     const [gender, setGender] = useState('')
     const [age, setAge] = useState('')
-    const [details, setDetails] = useState('')
+    const [date, setDate] = useState('')
 
     const history = useHistory();
 
@@ -29,7 +29,7 @@ export function Demographics(){
                 lastname,
                 gender,
                 age,
-                details,
+                date,
                 photo,
             })
             .then(() => {
@@ -37,7 +37,7 @@ export function Demographics(){
                 setLastname('')
                 setGender('')
                 setAge('')
-                setDetails('')
+                setDate('')
             })
         
         //navigate
@@ -108,8 +108,8 @@ export function Demographics(){
                             <div className="col-md"><input type="number" id="age" className="form-control" placeholder="years" value={age} onChange={e => setAge(e.target.value)}/></div>
                         </div>
                         <div className="form-group row">
-                            <label htmlFor="details" className="col-form-label col-md text-right">Visit Date</label>
-                            <div className="col-md"><input id="details" className="form-control" placeholder="MM/DD/YYYY"value={details} onChange={e => setDetails(e.target.value)}/></div>
+                            <label htmlFor="date" className="col-form-label col-md text-right">Visit Date</label>
+                            <div className="col-md"><input id="date" className="form-control" placeholder="MM/DD/YYYY"value={date} onChange={e => setDate(e.target.value)}/></div>
                         </div>
                     </div>
                     <div className="col-sm">

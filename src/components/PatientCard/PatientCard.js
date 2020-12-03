@@ -15,7 +15,7 @@ export function PatientCard(props){
                             <span className="card-text">Gender: {props.gender}</span><br></br>
                             <span className="card-text">Height: {props.height}</span><br></br>
 
-                            <p className="card-text"><small className="text-muted">Visit: 01/01/2020</small></p>
+                            <p className="card-text"><small className="text-muted">Visit: {props.date}</small></p>
                             {/* <a href="#" className="btn btn-outline-primary">See Health Vitals</a> */}
                         </div>
                     </div>

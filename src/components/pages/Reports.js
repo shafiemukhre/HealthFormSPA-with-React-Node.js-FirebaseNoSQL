@@ -36,6 +36,7 @@ function useHealthdata(){
                 medications: doc.data().medications,
                 notes: doc.data().notes,
                 pulse: doc.data().pulse,
+                height: doc.data().height,
                 weight: doc.data().weight,
                 temp: doc.data().temp,
                 bp: doc.data().bp
@@ -88,7 +89,8 @@ export function Reports(){
                                     photo = {p.photo}
                                     gender = {p.gender}
                                     age = {p.age}
-                                    height = {p.height}/>
+                                    height = {healths.filter(h => h.firstnameRef === p.firstname)[0].height}
+                                    date = {p.date}/>
                             )
                         } else { return null}
                     })}
