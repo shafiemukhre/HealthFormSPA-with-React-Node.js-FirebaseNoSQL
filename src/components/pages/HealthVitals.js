@@ -107,7 +107,7 @@ export function HealthVitals(){
                         </div>
                         <div className="form-group row">
                             <label htmlFor="bp" className="col-form-label col-md text-right">BP:</label>
-                            <div className="col-md"><input id="bp" type="number" className="form-control" placeholder="mm HG" value={bp} onChange={e => setBp(e.target.value)}/></div>
+                            <div className="col-md"><input id="bp" type="text" className="form-control" placeholder="systolic/diastolic mm HG" value={bp} onChange={e => setBp(e.target.value)}/></div>
                         </div>
                     </div>
                     <div className="col-sm">

@@ -48,7 +48,7 @@ export function PatientHealthData(props){
                         <div className="vitals_data">
                             <FontAwesomeIcon  className="icon" icon="thermometer-quarter"/>
                             <h5> Body Temp.</h5>
-                            <p><span className="counter">{props.temp}</span> F</p>
+                            <p><span className="counter">{props.temp}</span> °F</p>
                         </div>
                         <div className="vitals_data">
                             <FontAwesomeIcon className="icon" icon="stethoscope"/>
